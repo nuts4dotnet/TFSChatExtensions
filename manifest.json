@@ -13,9 +13,10 @@
   "content_scripts":[
    {
       "matches":["https://*.visualstudio.com/_rooms*"],
-      "js":["js/jquery/jquery.js", "js/highlight/highlight.pack.js", "src/bg/chatextensions.js", "src/bg/background.js"]
+      "js":["src/bg/background.js"]
    }
   ],
+  "web_accessible_resources": ["/src/bg/TeamRoomScript.tamper.js"],
   "options_page": "src/options_custom/index.html",
   "permissions": [
     "contentSettings",
