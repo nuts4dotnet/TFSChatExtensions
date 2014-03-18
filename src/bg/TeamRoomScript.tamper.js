@@ -49,7 +49,17 @@ var tfsChatExtensions = {
 						return $('<div class="message-text"></div>').html($(this).html().replace(/#c(\d*)/i, '<a href="/DefaultCollection/_versionControl/changeset/$1">Changeset $1</a>'));
 					},
 					enabled: true
+				},
+				{
+					// Syntax Highlighting
+					elementToParse: function () { return $(this); },
+					matchFunction: function () { return /```([\s\S]*)```/i.test($(this).text()); },
+					newElement: function () {
+						return $('<div class="message-text"></div>').html($(this).html().replace(/```([\s\S]*)```/i, '<pre><code>$1</code></pre>'));
+					},
+					enabled: true
 				}
+
 			]
 		}
 	},
@@ -156,7 +166,8 @@ var tfsChatExtensions = {
 		}
 	},
 	handlers: {
-		processDisplayedMessage: function(messageDiv) {
+		processDisplayedMessage: function (messageDiv) {
+			var messageDivParent = $(messageDiv).parent();
 			// Run all handler expressions against the message body
 			$.each(tfsChatExtensions.config.content.handlerExpressions, function() {
 				var handler = this;
@@ -172,6 +183,9 @@ var tfsChatExtensions = {
 				}
 			});
 
+			// Apply syntax highlighting if the message block contains "<pre><code>"
+			// Feels ugly doing this here, but couldn't think of a better alternative
+			$.each($("pre code", messageDivParent), function() { hljs.highlightBlock(this); });
 		},
 		messageReceived: function (roomId, message) {
 			if (tfsChatExtensions.config.notification.showMyOwnMessages || tfsChatExtensions.utility.isNotMe(message)) {
@@ -200,6 +214,16 @@ var tfsChatExtensions = {
 // Where the magic happens
 $(function () {
 	console.log("TFS Notifications - Setting up 10 second delay...");
+
+	var cdnSyntaxHighlighter = "//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/";
+	$('head').append('<link href="' + cdnSyntaxHighlighter + 'styles/default.min.css" rel="stylesheet" type="text/css" />');
+	$('head').append('<link href="' + cdnSyntaxHighlighter + 'styles/obsidian.min.css" rel="stylesheet" type="text/css" />');
+
+	// Load syntax highlighter
+	$.getScript(cdnSyntaxHighlighter + "highlight.min.js", function () {
+		hljs.initHighlightingOnLoad();
+	});
+
 	// Activate the plugin after 10 seconds
 	window.setTimeout(function () {
 		// Process already displayed messages
