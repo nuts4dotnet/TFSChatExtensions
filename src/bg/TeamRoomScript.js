@@ -1,12 +1,3 @@
-// ==UserScript==
-// @name       TFS Team Room Chrome Plugin
-// @namespace  http://nuts4.net
-// @version    0.54
-// @description Getting tired of switching back and forth between a browser and Visual Studio...just to see if you have any chat notifications?  Use this script, and get your notifications directly on your desktop!
-// @match      https://*.visualstudio.com/_rooms*
-// @copyright  2013+, Joe Coutcher
-// ==/UserScript==
-
 window.tfsChatExtensions = (typeof window.tfsChatExtensions === 'undefined')
 	? {} : window.tfsChatExtensions;
 

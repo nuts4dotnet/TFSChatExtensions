@@ -19,7 +19,7 @@
       "js":["src/bg/background.js"]
    }
   ],
-  "web_accessible_resources": ["/src/bg/TeamRoomScript.tamper.js"],
+  "web_accessible_resources": ["/src/bg/TeamRoomScript.js"],
   "options_page": "src/options_custom/index.html",
   "permissions": [
     "contentSettings",
