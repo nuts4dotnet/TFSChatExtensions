@@ -13,7 +13,7 @@
   "content_scripts":[
    {
       "matches":["https://*.visualstudio.com/_rooms*"],
-      "js":["js/jquery/jquery.js", "src/bg/background.js"]
+      "js":["js/jquery/jquery.js", "js/highlight/highlight.pack.js", "src/bg/chatextensions.js", "src/bg/background.js"]
    }
   ],
   "options_page": "src/options_custom/index.html",

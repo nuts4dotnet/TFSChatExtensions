@@ -1,5 +1,15 @@
 $(function() {
 
+	console.log("::::Initializing TFSChat"); 
+
+	var cdnSyntaxHighlighter = "//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/";
+	$('head').append('<link href="' + cdnSyntaxHighlighter + 'styles/default.min.css" rel="stylesheet" type="text/css" />');
+	$('head').append('<link href="' + cdnSyntaxHighlighter + 'styles/obsidian.min.css" rel="stylesheet" type="text/css" />');
+
+	// Load syntax highlighter
+	$.getScript(cdnSyntaxHighlighter + "highlight.min.js", function () {
+		hljs.initHighlightingOnLoad();
+	});
 
 	//observerConfig
 	var config = {childList: true};
@@ -10,6 +20,9 @@ $(function() {
     		//this is kinda lame on a reusable observer but we are only observing the chat-box in this extension...
     		//just check the last thing for images	
     		replaceImages(true);
+
+    		//should probalby check that the value is there -- mutation *shouldn't* fire if not though
+    		tfsChatExtensions.handlers.messageReceived("", $(".message-text").last()[0]);
   		});    
 	});
 
@@ -35,8 +48,13 @@ $(function() {
    
     // Activate the plugin after 10 seconds
     window.setTimeout(function() {
-    	console.log("TFSChat Extension Loaded");
-        replaceImages();
+    	console.log("::::TFSChat Extension Loaded");
+
+		// Process already displayed messages
+		tfsChatExtensions.utility.processAllDisplayedMessages();
+
+		// Scroll the list to the top
+		window.setTimeout(tfsChatExtensions.utility.scrollChatToTop, 100);
 
 		//setup observer on chat-box
 		var target = $(".chat-box").not(".hidden")[0];
