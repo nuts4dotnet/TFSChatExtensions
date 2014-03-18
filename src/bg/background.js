@@ -1,13 +1,48 @@
-// if you checked "fancy-settings" in extensionizr.com, uncomment this lines
-
-// var settings = new Store("settings", {
-//     "sample_setting": "This is how you use Store.js to remember values"
-// });
+$(function() {
 
 
-//example of using a message handler from the inject scripts
-chrome.extension.onMessage.addListener(
-  function(request, sender, sendResponse) {
-  	chrome.pageAction.show(sender.tab.id);
-    sendResponse();
-  });
+	//observerConfig
+	var config = {childList: true};
+
+	//function when observer conditions are met
+	var observer = new MutationObserver(function(mutations) {
+  		mutations.forEach(function(mutation) {
+    		//this is kinda lame on a reusable observer but we are only observing the chat-box in this extension...
+    		//just check the last thing for images	
+    		replaceImages(true);
+  		});    
+	});
+
+    if (window.webkitNotifications.checkPermission() != 0) {
+        window.webkitNotifications.requestPermission();
+    }
+   
+    //scan thru all messages and look for images
+    var replaceImages = function(last){
+    	var arr = [];
+
+    	if (last === true){
+    		arr = $(".message-text:contains('http')").last();
+    	} else { 
+    		arr = $(".message-text:contains('http')");
+    	}
+        var isImgUrl= /https?:\/\/.*\.(?:png|jpg|gif)/i;
+        $.each(arr, function(index, value){
+            //look through text instead of html so thing that are currently images don't get messed up
+            $(value).html($(value).text().replace(isImgUrl,'<img src="$&"/>'));
+        });
+    }
+   
+    // Activate the plugin after 10 seconds
+    window.setTimeout(function() {
+    	console.log("TFSChat Extension Loaded");
+        replaceImages();
+
+		//setup observer on chat-box
+		var target = $(".chat-box").not(".hidden")[0];
+
+        //start observing
+		observer.observe(target, config);
+
+    }, 10000);
+});
