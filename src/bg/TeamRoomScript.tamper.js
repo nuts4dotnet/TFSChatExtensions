@@ -19,7 +19,8 @@ var tfsChatExtensions = {
 			enablePopupNotifications: true,
 			duration: 5000,
 			showMyOwnMessages: false, // For debugging purposes
-			keepMentionsOpen: true
+			keepMentionsOpen: true,
+			lastSpokeAt: 0 // Don't change this
 		},
 		content: {
 			handlerExpressions: [
@@ -66,7 +67,7 @@ var tfsChatExtensions = {
 
 			return false;
 		},
-		show: function(icon, title, content, duration) {
+		show: function(icon, title, content, duration, id) {
 			if (tfsChatExtensions.config.notification.enablePopupNotifications && tfsChatExtensions.notifications.requestNotifyPermission()) {
 				var notification = window.webkitNotifications.createNotification(icon, title, content);
 				notification.onclick = tfsChatExtensions.utility.bringWindowIntoFocus;
@@ -81,7 +82,16 @@ var tfsChatExtensions = {
 			}
 
 			if (tfsChatExtensions.config.notification.enableTextToSpeech) {
-				var msg = new SpeechSynthesisUtterance('Message from ' + title + ' reads,,,' + content);
+				var isSenderHidden = $('#message_' + id + ' .message-sender.hidden').length > 0;
+				var currentTime = new Date() / 1000;
+				var greeting = '';
+
+				if (!isSenderHidden || (currentTime - tfsChatExtensions.config.notification.lastSpokeAt > 60))
+					greeting = 'Message from ' + title + ' reads,,,';
+
+				tfsChatExtensions.config.notification.lastSpokeAt = currentTime;
+
+				var msg = new SpeechSynthesisUtterance(greeting + content);
 				window.speechSynthesis.speak(msg);
 			}
 		}
@@ -104,7 +114,8 @@ var tfsChatExtensions = {
 			return {
 				title: serverMessage.type,
 				content: serverMessage.title,
-				icon: tfsChatExtensions.constants.tfsServerIcon
+				icon: tfsChatExtensions.constants.tfsServerIcon,
+				messageId: message.Id
 			};
 		},
 		parseMessage: function(message) {
@@ -116,7 +127,8 @@ var tfsChatExtensions = {
 			return {
 				title: message.PostedByUserName,
 				content: message.Content,
-				icon: tfsChatExtensions.constants.tfsIdentityImageUrl + message.PostedByUserTfId
+				icon: tfsChatExtensions.constants.tfsIdentityImageUrl + message.PostedByUserTfId,
+				messageId: message.Id
 			};
 		}
 	},
@@ -169,7 +181,7 @@ var tfsChatExtensions = {
 					? 0 // display indefinitely
 					: tfsChatExtensions.config.notification.duration;
 
-				tfsChatExtensions.notifications.show(parsedMessage.icon, parsedMessage.title, parsedMessage.content, messageDuration);
+				tfsChatExtensions.notifications.show(parsedMessage.icon, parsedMessage.title, parsedMessage.content, messageDuration, parsedMessage.messageId);
 			}
 
 			// check if chat control is at scroll top
