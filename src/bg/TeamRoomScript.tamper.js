@@ -7,7 +7,10 @@
 // @copyright  2013+, Joe Coutcher
 // ==/UserScript==
 
-var tfsChatExtensions = {
+window.tfsChatExtensions = (typeof window.tfsChatExtensions === 'undefined')
+	? {} : window.tfsChatExtensions;
+
+$.extend(true, window.tfsChatExtensions, {
 	constants: {
 		tfsIdentityImageUrl: "/_api/_common/IdentityImage?id=",
 		tfsServerIcon: "/_static/tfs/20131021T164530/_content/tfs-large-icons.png",
@@ -15,12 +18,12 @@ var tfsChatExtensions = {
 	},
 	config: {
 		notification: {
-			enableTextToSpeech: false,
-			enablePopupNotifications: true,
-			duration: 5000,
-			showMyOwnMessages: false, // For debugging purposes
-			keepMentionsOpen: true,
-			lastSpokeAt: 0 // Don't change this
+			//enableTextToSpeech: false,
+			//enablePopupNotifications: true,
+			//duration: 5000,
+			//showMyOwnMessages: false, // For debugging purposes
+			//keepMentionsOpen: true,
+			//lastSpokeAt: 0 // Don't change this
 		},
 		content: {
 			handlerExpressions: [
@@ -209,7 +212,7 @@ var tfsChatExtensions = {
 			}
 		}
 	}
-};
+});
 
 // Where the magic happens
 $(function () {

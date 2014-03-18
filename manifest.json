@@ -1,8 +1,11 @@
 {
-  "name": "TFSChat",
-  "version": "0.0.1",
+  "name": "TFS Chat Extensions",
+  "version": "0.1.0",
   "manifest_version": 2,
-  "description": "Add-ons to the TFS Team Rooms",
+  "background": {
+	"scripts": ["/src/store.js", "/src/main.js"]
+  },
+  "description": "Add-ons to the TFS Team Rooms (code syntax highlighting, pop-up noticiations, etc.)",
   "homepage_url": "https://github.com/nuts4dotnet/TFSChatExtensions",
   "icons": {
     "16": "icons/icon16.png",
