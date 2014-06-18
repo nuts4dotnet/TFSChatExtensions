@@ -19,9 +19,16 @@ $.extend(true, window.tfsChatExtensions, {
 		content: {
 			handlerExpressions: [
 				{
-					// Image tags/animated gifs
+					// animated gifs
 					elementToParse: function() { return $('a', this); },
-					matchFunction: function() { return /https?:\/\/.*\.(?:png|jpg|gif)/i.test($(this).attr('href')); },
+					matchFunction: function() { return /https?:\/\/.*\.(?:gif)/i.test($(this).attr('href')); },
+					newElement: function() { return $('<img width="210" />').attr('src', $(this).attr('href')); },
+					enabled: function() { return tfsChatExtensions.config.notification.enableAnimatedGifs; }
+				},
+				{
+					// Image tags
+					elementToParse: function() { return $('a', this); },
+					matchFunction: function() { return /https?:\/\/.*\.(?:png|jpg|jpeg)/i.test($(this).attr('href')); },
 					newElement: function() { return $('<img width="210" />').attr('src', $(this).attr('href')); },
 					enabled: true
 				},
@@ -165,7 +172,7 @@ $.extend(true, window.tfsChatExtensions, {
 			// Run all handler expressions against the message body
 			$.each(tfsChatExtensions.config.content.handlerExpressions, function() {
 				var handler = this;
-				if (handler.enabled) {
+				if ((typeof(handler.enabled) === 'boolean' && handler.enabled) || handler.enabled()) {
 					// Find all matching elements, and iterate through them
 					$.each(handler.elementToParse.call($(messageDiv)), function() {
 						// See if match function returns true against element

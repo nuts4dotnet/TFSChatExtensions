@@ -4,7 +4,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		"enablePopupNotifications": true,
 		"duration": 5000,
 		"showMyOwnMessages": false,
-		"keepMentionsOpen": true
+		"keepMentionsOpen": true,
+		"enableAnimagedGifs": false,
 	});
 
 	if (request.method == "getOptions") {

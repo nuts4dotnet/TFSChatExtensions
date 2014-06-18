@@ -44,6 +44,13 @@ this.manifest = {
 			"name": "keepMentionsOpen",
 			"type": "checkbox",
 			"label": "Keep Mentions Open"
+		},
+		{
+			"tab": "General Settings",
+			"group": "Configuration",
+			"name": "enableAnimatedGifs",
+			"type": "checkbox",
+			"label": "Enable Animated GIFs"
 		}
     ]
 };
