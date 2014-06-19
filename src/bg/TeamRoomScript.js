@@ -67,12 +67,10 @@ $.extend(true, window.tfsChatExtensions, {
 	notifications: {
 		requestNotifyPermission: function() {
 			// Verify notifications can be displayed
-			if (window.webkitNotifications) {
+			if (window.Notification) {
 				// 0 means we have permission to display notifications
-				if (window.webkitNotifications.checkPermission() == 0) {
+				if (window.Notification.permission == "granted") {
 					return true;
-				} else {
-					window.webkitNotifications.requestPermission();
 				}
 			}
 
@@ -80,14 +78,14 @@ $.extend(true, window.tfsChatExtensions, {
 		},
 		show: function(icon, title, content, duration, id) {
 			if (tfsChatExtensions.config.notification.enablePopupNotifications && tfsChatExtensions.notifications.requestNotifyPermission()) {
-				var notification = window.webkitNotifications.createNotification(icon, title, content);
+				var notification = new Notification(title, { icon: icon, body: content, tag: id });
 				notification.onclick = tfsChatExtensions.utility.bringWindowIntoFocus;
-				notification.show();
+				//notification.show();
 
 				// If duration equals zero, then keep the notification open until user closes it
 				if (duration != 0) {
 					window.setTimeout(function() {
-						notification.cancel();
+						notification.close();
 					}, duration);
 				}
 			}
@@ -161,6 +159,7 @@ $.extend(true, window.tfsChatExtensions, {
 		},
 		bringWindowIntoFocus: function () {
 			window.focus();
+			this.close();
 		},
 		isNotMe: function (message) {
 			return message.PostedByUserTfId != $.connection.chatHub.state.id;
@@ -214,7 +213,7 @@ $.extend(true, window.tfsChatExtensions, {
 
 // Where the magic happens
 $(function () {
-	console.log("TFS Notifications - Setting up 10 second delay...");
+	console.log("TFS Notifications - Waiting for text area to initialize...");
 
 	var cdnSyntaxHighlighter = "//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/";
 	$('head').append('<link href="' + cdnSyntaxHighlighter + 'styles/default.min.css" rel="stylesheet" type="text/css" />');
@@ -224,18 +223,46 @@ $(function () {
 	$.getScript(cdnSyntaxHighlighter + "highlight.min.js", function () {
 		hljs.initHighlightingOnLoad();
 	});
+	
+	var timerId = window.setInterval(function() {
+		var textBox = $(".inner-message-input textarea");
+		if (textBox.length > 0) {
+			if (!textBox.prop("disabled")) {
+				window.clearInterval(timerId);
 
-	// Activate the plugin after 10 seconds
-	window.setTimeout(function () {
-		// Process already displayed messages
-		tfsChatExtensions.utility.processAllDisplayedMessages();
+				// Process already displayed messages
+				tfsChatExtensions.utility.processAllDisplayedMessages();
 
-		// Scroll the list to the top
-		window.setTimeout(tfsChatExtensions.utility.scrollChatToTop, 100);
+				// Scroll the list to the top
+				window.setTimeout(tfsChatExtensions.utility.scrollChatToTop, 100);
 
-		// Attach to message received event
-		$.connection.chatHub.on('messageReceived', tfsChatExtensions.handlers.messageReceived);
+				// Attach to message received event
+				$.connection.chatHub.on('messageReceived', tfsChatExtensions.handlers.messageReceived);
 
-		console.log("TFS Notification code has loaded.");
-	}, 10000);
+				console.log("TFS Notification code has loaded.");
+			}
+		}
+	}, 250);
+
+	var timerId2 = window.setInterval(function() {
+		var rightPane = $(".top-level-menu-v2.user-menu li[command='user']");
+		if (rightPane.length > 0) {
+			window.clearInterval(timerId2);
+			if (window.Notification) {
+				if (window.Notification.permission == "default") {
+					var btn = $("<li></li>").addClass("requestnotificationpermission").addClass("menu-item").css("cursor", "pointer");
+					btn.text("Enable Chat Notifications");
+					$(".top-level-menu-v2.user-menu").prepend(btn);
+					
+					$(".requestnotificationpermission").click(function() {
+						window.Notification.requestPermission(function(status) {
+							window.Notification.permission = status;
+							$(".requestnotificationpermission").remove();
+						});
+					});
+				}
+			}
+		}
+	}, 1000);
+
 });
