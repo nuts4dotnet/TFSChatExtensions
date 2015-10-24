@@ -118,26 +118,26 @@ $.extend(true, window.tfsChatExtensions, {
 			return false;
 		},
 		parseSystemMessage: function(message) {
-			var serverMessage = $.parseJSON(message.Content);
+			var serverMessage = $.parseJSON(message.content);
 
 			return {
 				title: serverMessage.type,
 				content: serverMessage.title,
 				icon: tfsChatExtensions.constants.tfsServerIcon,
-				messageId: message.Id
+				messageId: message.id
 			};
 		},
 		parseMessage: function(message) {
-			if (message.Content.indexOf("{") == 0)
+			if (message.content.indexOf("{") == 0)
 				return parseSystemMessage(message);
 
-			var userIcon = tfsChatExtensions.constants.tfsIdentityImageUrl + message.PostedByUserTfId;
+			var userIcon = tfsChatExtensions.constants.tfsIdentityImageUrl + message.postedByUserTfId;
 
 			return {
-				title: message.PostedByUserName,
-				content: message.Content,
-				icon: tfsChatExtensions.constants.tfsIdentityImageUrl + message.PostedByUserTfId,
-				messageId: message.Id
+				title: message.postedByUserName,
+				content: message.content,
+				icon: tfsChatExtensions.constants.tfsIdentityImageUrl + message.postedByUserTfId,
+				messageId: message.id
 			};
 		}
 	},
@@ -162,7 +162,7 @@ $.extend(true, window.tfsChatExtensions, {
 			this.close();
 		},
 		isNotMe: function (message) {
-			return message.PostedByUserTfId != $.connection.chatHub.state.id;
+			return message.postedByUserTfId != $.connection.chatHub.state.id;
 		}
 	},
 	handlers: {
@@ -191,7 +191,7 @@ $.extend(true, window.tfsChatExtensions, {
 			if (tfsChatExtensions.config.notification.showMyOwnMessages || tfsChatExtensions.utility.isNotMe(message)) {
 				var parsedMessage = tfsChatExtensions.parsers.parseMessage(message);
 
-				var messageDuration = tfsChatExtensions.parsers.isUserMentioned(message.Mentions)
+				var messageDuration = tfsChatExtensions.parsers.isUserMentioned(message.mentions)
 					? 0 // display indefinitely
 					: tfsChatExtensions.config.notification.duration;
 
@@ -201,7 +201,7 @@ $.extend(true, window.tfsChatExtensions, {
 			// check if chat control is at scroll top
 			var isChatScrolledToTop = tfsChatExtensions.utility.isChatScrolledToTop();
 
-			tfsChatExtensions.handlers.processDisplayedMessage($('#message_' + message.Id + ' .message-text'));
+			tfsChatExtensions.handlers.processDisplayedMessage($('#message_' + message.id + ' .message-text'));
 
 			// If chat was near the top before processing, then scroll!
 			if (isChatScrolledToTop) {
