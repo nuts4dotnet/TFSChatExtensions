@@ -1,6 +1,6 @@
 {
   "name": "TFS Chat Extensions",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "manifest_version": 2,
   "background": {
 	"scripts": ["/src/store.js", "/src/main.js"]
