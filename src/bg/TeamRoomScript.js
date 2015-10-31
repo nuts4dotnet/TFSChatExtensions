@@ -45,9 +45,9 @@ $.extend(true, window.tfsChatExtensions, {
 				{
 					// Changeset linkage
 					elementToParse: function () { return $(this); },
-					matchFunction: function () { return /#c(\d*)/i.test($(this).text()); },
+					matchFunction: function () { return /##c(\d+)/i.test($(this).text()); },
 					newElement: function () {
-						return $('<div class="message-text"></div>').html($(this).html().replace(/#c(\d*)/i, '<a href="/DefaultCollection/_versionControl/changeset/$1">Changeset $1</a>'));
+						return $('<div class="message-text"></div>').html($(this).html().replace(/##c(\d+)/i, '<a target="_blank" href="/DefaultCollection/_versionControl/changeset/$1">Changeset $1</a>'));
 					},
 					enabled: true
 				},
@@ -118,25 +118,25 @@ $.extend(true, window.tfsChatExtensions, {
 			return false;
 		},
 		parseSystemMessage: function(message) {
-			var serverMessage = $.parseJSON(message.content);
+			var serverMessage = $.parseJSON(message.Content || message.content);
 
 			return {
 				title: serverMessage.type,
 				content: serverMessage.title,
 				icon: tfsChatExtensions.constants.tfsServerIcon,
-				messageId: message.id
+				messageId: message.Id || message.id
 			};
 		},
 		parseMessage: function(message) {
-			if (message.content.indexOf("{") == 0)
+			if ((message.Content || message.content).indexOf("{") == 0)
 				return parseSystemMessage(message);
 
-			var userIcon = tfsChatExtensions.constants.tfsIdentityImageUrl + message.postedByUserTfId;
+			var userIcon = tfsChatExtensions.constants.tfsIdentityImageUrl + (message.PostedByUserTfId || message.postedByUserTfId);
 
 			return {
-				title: message.postedByUserName,
-				content: message.content,
-				icon: tfsChatExtensions.constants.tfsIdentityImageUrl + message.postedByUserTfId,
+				title: (message.PostedByUserName || message.postedByUserName),
+				content: (message.Content || message.content),
+				icon: tfsChatExtensions.constants.tfsIdentityImageUrl + (message.PostedByUserTfId || message.postedByUserTfId),
 				messageId: message.id
 			};
 		}
@@ -162,7 +162,7 @@ $.extend(true, window.tfsChatExtensions, {
 			this.close();
 		},
 		isNotMe: function (message) {
-			return message.postedByUserTfId != $.connection.chatHub.state.id;
+			return (message.PostedByUserTfId || message.postedByUserTfId) != $.connection.chatHub.state.id;
 		}
 	},
 	handlers: {
@@ -191,7 +191,7 @@ $.extend(true, window.tfsChatExtensions, {
 			if (tfsChatExtensions.config.notification.showMyOwnMessages || tfsChatExtensions.utility.isNotMe(message)) {
 				var parsedMessage = tfsChatExtensions.parsers.parseMessage(message);
 
-				var messageDuration = tfsChatExtensions.parsers.isUserMentioned(message.mentions)
+				var messageDuration = tfsChatExtensions.parsers.isUserMentioned(message.Mentions || message.mentions)
 					? 0 // display indefinitely
 					: tfsChatExtensions.config.notification.duration;
 
@@ -201,7 +201,7 @@ $.extend(true, window.tfsChatExtensions, {
 			// check if chat control is at scroll top
 			var isChatScrolledToTop = tfsChatExtensions.utility.isChatScrolledToTop();
 
-			tfsChatExtensions.handlers.processDisplayedMessage($('#message_' + message.id + ' .message-text'));
+			tfsChatExtensions.handlers.processDisplayedMessage($('#message_' + (message.Id || message.id) + ' .message-text'));
 
 			// If chat was near the top before processing, then scroll!
 			if (isChatScrolledToTop) {

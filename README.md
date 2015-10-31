@@ -1,4 +1,4 @@
 TFSChatExtensions
 =================
 
-Chrome Plugin that extends TFS/Visual Studio Online's Team Chat
+Chrome Plugin that extends TFS/Visual Studio Team Chat (Online and On-premise)
