@@ -129,7 +129,7 @@ $.extend(true, window.tfsChatExtensions, {
 		},
 		parseMessage: function(message) {
 			if ((message.Content || message.content).indexOf("{") == 0)
-				return parseSystemMessage(message);
+				return tfsChatExtensions.parsers.parseSystemMessage(message);
 
 			var userIcon = tfsChatExtensions.constants.tfsIdentityImageUrl + (message.PostedByUserTfId || message.postedByUserTfId);
 
