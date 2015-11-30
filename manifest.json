@@ -15,7 +15,7 @@
   "default_locale": "en",
   "content_scripts":[
    {
-      "matches":["*://*/_rooms*", "*://*/*/_rooms*"]
+      "matches":["*://*/_rooms*", "*://*/*/_rooms*"],
       "js":["src/bg/background.js"]
    }
   ],
