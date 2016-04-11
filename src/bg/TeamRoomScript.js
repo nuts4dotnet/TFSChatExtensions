@@ -47,6 +47,11 @@ $.extend(true, window.tfsChatExtensions, {
 					elementToParse: function () { return $(this); },
 					matchFunction: function () { return /##c(\d+)/i.test($(this).text()); },
 					newElement: function () {
+					    var collectionName = tfsChatExtensions.parsers.parseUrlParameter('collectionName');
+
+					    if (collectionName == '')
+					        collectionName = 'DefaultCollection';
+
 						return $('<div class="message-text"></div>').html($(this).html().replace(/##c(\d+)/i, '<a target="_blank" href="/DefaultCollection/_versionControl/changeset/$1">Changeset $1</a>'));
 					},
 					enabled: true
@@ -139,6 +144,15 @@ $.extend(true, window.tfsChatExtensions, {
 				icon: tfsChatExtensions.constants.tfsIdentityImageUrl + (message.PostedByUserTfId || message.postedByUserTfId),
 				messageId: message.id
 			};
+		},
+		parseUrlParameter: function(name){
+		    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+		    if (results==null){
+		        return null;
+		    }
+		    else{
+		        return results[1] || 0;
+		    }
 		}
 	},
 	utility: {
