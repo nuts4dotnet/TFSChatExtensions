@@ -3,8 +3,8 @@ var scripts = docElem.getElementsByTagName("script");
 
 var isTFSChat = false;
 for(var i = 0; i < scripts.length; i++) {
-    if (scripts[i].src && scripts[i].src.indexOf("TFS.Resources.Chat.js") >= 0) {
-        // If there's a script file named TFS.ChatRoom.js on the page...good chances this is TFS :-)
+    if (scripts[i].src && (scripts[i].src.indexOf("TFS.Resources.Chat.js") >= 0 || scripts[i].src.indexOf("TFS.ChatRoom.js") >= 0) {
+        // If there's a script file with one of the above names included in the page...good chances this is TFS :-)
         isTFSChat = true;
     }
 }
