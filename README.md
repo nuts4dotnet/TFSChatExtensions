@@ -16,6 +16,14 @@ You can configure specific features of the plugin by accessing the options page 
 
 ---
 
+##Version 0.1.5 7/28/2016:##
+
+Integrated patch requests from NikGovorov and aschwab related to issues w/ on-premise support.  As I don't have access to an on-premise server, if you run into issues, please report them at: https://github.com/nuts4dotnet/TFSChatExtensions/issues
+
+##Version 0.1.4 1/7/2016:##
+
+Integrated some bug fixes for on-premise instances.
+
 ##Version 0.1.3 10/31/2015##
 
 ####Experimental On-premise support####
