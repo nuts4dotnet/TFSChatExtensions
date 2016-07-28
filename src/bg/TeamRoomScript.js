@@ -3,8 +3,8 @@ window.tfsChatExtensions = (typeof window.tfsChatExtensions === 'undefined')
 
 $.extend(true, window.tfsChatExtensions, {
 	constants: {
-		tfsIdentityImageUrl: "/_api/_common/IdentityImage?id=",
-		tfsServerIcon: "/_static/tfs/20131021T164530/_content/tfs-large-icons.png",
+		tfsIdentityImageUrl: window.location.pathname.replace('/_rooms', '') + "/_api/_common/IdentityImage?id=",
+		tfsServerIcon: window.location.pathname.replace('/_rooms', '') + "/_static/tfs/20131021T164530/_content/tfs-large-icons.png",
 		chatBoxSelector: ".chatroom-chat-control.live-chat:not(.hidden) ul.chat-box, .chatroom-chat-control.transcript-chat:not(.hidden) ul.chat-box"
 	},
 	config: {
@@ -48,11 +48,12 @@ $.extend(true, window.tfsChatExtensions, {
 					matchFunction: function () { return /##c(\d+)/i.test($(this).text()); },
 					newElement: function () {
 					    var collectionName = tfsChatExtensions.parsers.parseUrlParameter('collectionName');
+						var relativePath = tfsChatExtensions.utility.getRelativePath();
 
 					    if (collectionName == '')
 					        collectionName = 'DefaultCollection';
 
-						return $('<div class="message-text"></div>').html($(this).html().replace(/##c(\d+)/i, '<a target="_blank" href="/DefaultCollection/_versionControl/changeset/$1">Changeset $1</a>'));
+						return $('<div class="message-text"></div>').html($(this).html().replace(/##c(\d+)/i, '<a target="_blank" href="' + relativePath + '/' + collectionName + '/_versionControl/changeset/$1">Changeset $1</a>'));
 					},
 					enabled: true
 				},
@@ -151,7 +152,7 @@ $.extend(true, window.tfsChatExtensions, {
 		    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
 		    if (results==null){
 		        return null;
-		    }
+		}
 		    else{
 		        return results[1] || 0;
 		    }
