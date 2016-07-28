@@ -3,8 +3,8 @@ window.tfsChatExtensions = (typeof window.tfsChatExtensions === 'undefined')
 
 $.extend(true, window.tfsChatExtensions, {
 	constants: {
-		tfsIdentityImageUrl: window.location.pathname.replace('/_rooms', '') + "/_api/_common/IdentityImage?id=",
-		tfsServerIcon: window.location.pathname.replace('/_rooms', '') + "/_static/tfs/20131021T164530/_content/tfs-large-icons.png",
+		tfsIdentityImageUrl: "/_api/_common/IdentityImage?id=",
+		tfsServerIcon: "//www.visualstudio.com/favicon.ico",
 		chatBoxSelector: ".chatroom-chat-control.live-chat:not(.hidden) ul.chat-box, .chatroom-chat-control.transcript-chat:not(.hidden) ul.chat-box"
 	},
 	config: {
@@ -52,8 +52,16 @@ $.extend(true, window.tfsChatExtensions, {
 
 					    if (collectionName == '')
 					        collectionName = 'DefaultCollection';
+                        
+                        var pathPart = relativePath + '/'
+                        if (tfsChatExtensions.utility.IsOnPremise()) {
+                            pathPart += collectionName;
+                        } else {
+                            // VSO does everything via DefaultCollection
+                            pathPart += "DefaultCollection";
+                        }
 
-						return $('<div class="message-text"></div>').html($(this).html().replace(/##c(\d+)/i, '<a target="_blank" href="' + relativePath + '/' + collectionName + '/_versionControl/changeset/$1">Changeset $1</a>'));
+						return $('<div class="message-text"></div>').html($(this).html().replace(/##c(\d+)/i, '<a target="_blank" href="' + pathPart + '/_versionControl/changeset/$1">Changeset $1</a>'));
 					},
 					enabled: true
 				},
@@ -137,9 +145,13 @@ $.extend(true, window.tfsChatExtensions, {
 			if ((message.Content || message.content).indexOf("{") == 0)
 				return tfsChatExtensions.parsers.parseSystemMessage(message);
 
-
-			var userIcon = tfsChatExtensions.utility.getRelativePath() + '/' + tfsChatExtensions.parsers.parseUrlParameter('collectionName') +
-                tfsChatExtensions.constants.tfsIdentityImageUrl + (message.PostedByUserTfId || message.postedByUserTfId);
+            var userIcon = "";
+            if (tfsChatExtensions.utility.IsOnPremise()) {
+                var userIcon = tfsChatExtensions.utility.getRelativePath() + '/' + tfsChatExtensions.parsers.parseUrlParameter('collectionName') +
+                    tfsChatExtensions.constants.tfsIdentityImageUrl + (message.PostedByUserTfId || message.postedByUserTfId);
+            } else {
+                var userIcon = tfsChatExtensions.constants.tfsIdentityImageUrl + (message.PostedByUserTfId || message.postedByUserTfId)
+            }
 
 			return {
 				title: (message.PostedByUserName || message.postedByUserName),
@@ -159,6 +171,9 @@ $.extend(true, window.tfsChatExtensions, {
 		}
 	},
 	utility: {
+        IsOnPremise: function() {
+            return !window.location.host.toLowerCase().endsWith('.visualstudio.com');
+        },
 		scrollChatToTop: function() {
 			// Scroll to the top of the box
 			var $chatBox = $(tfsChatExtensions.constants.chatBoxSelector);
