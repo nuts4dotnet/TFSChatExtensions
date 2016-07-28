@@ -47,6 +47,11 @@ $.extend(true, window.tfsChatExtensions, {
 					elementToParse: function () { return $(this); },
 					matchFunction: function () { return /##c(\d+)/i.test($(this).text()); },
 					newElement: function () {
+					    var collectionName = tfsChatExtensions.parsers.parseUrlParameter('collectionName');
+
+					    if (collectionName == '')
+					        collectionName = 'DefaultCollection';
+
 						return $('<div class="message-text"></div>').html($(this).html().replace(/##c(\d+)/i, '<a target="_blank" href="/DefaultCollection/_versionControl/changeset/$1">Changeset $1</a>'));
 					},
 					enabled: true
@@ -131,14 +136,25 @@ $.extend(true, window.tfsChatExtensions, {
 			if ((message.Content || message.content).indexOf("{") == 0)
 				return tfsChatExtensions.parsers.parseSystemMessage(message);
 
-			var userIcon = tfsChatExtensions.constants.tfsIdentityImageUrl + (message.PostedByUserTfId || message.postedByUserTfId);
+
+			var userIcon = tfsChatExtensions.utility.getRelativePath() + '/' + tfsChatExtensions.parsers.parseUrlParameter('collectionName') +
+                tfsChatExtensions.constants.tfsIdentityImageUrl + (message.PostedByUserTfId || message.postedByUserTfId);
 
 			return {
 				title: (message.PostedByUserName || message.postedByUserName),
 				content: (message.Content || message.content),
-				icon: tfsChatExtensions.constants.tfsIdentityImageUrl + (message.PostedByUserTfId || message.postedByUserTfId),
+				icon: userIcon,
 				messageId: message.id
 			};
+		},
+		parseUrlParameter: function(name){
+		    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+		    if (results==null){
+		        return null;
+		    }
+		    else{
+		        return results[1] || 0;
+		    }
 		}
 	},
 	utility: {
@@ -163,6 +179,10 @@ $.extend(true, window.tfsChatExtensions, {
 		},
 		isNotMe: function (message) {
 			return (message.PostedByUserTfId || message.postedByUserTfId) != $.connection.chatHub.state.id;
+		},
+		getRelativePath: function()
+		{
+		    return window.location.pathname.replace("/_rooms", "");
 		}
 	},
 	handlers: {
